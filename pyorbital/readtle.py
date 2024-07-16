@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 #This function reads the tle data from TLE.txt
 def read_tle():
-    with open('C:/Users/Administrator/satellites/pyorbital/TLEs.txt', 'r') as f:
+    with open('TLEs.txt', 'r') as f:
         lines = f.readlines()
         
     #An empty dictionary to store the satellite details
@@ -53,7 +53,7 @@ def calculate_visibility(satellites, targets):
 
 satellites = read_tle()
 
-targets = pd.read_csv('C:/Users/Administrator/satellites/pyorbital/targets.csv')
+targets = pd.read_csv('targets.csv')
 
 visibility_df = calculate_visibility(satellites, targets)
 
@@ -65,22 +65,25 @@ visibility.set_index('Time', inplace=True)
 visibility.to_csv('results/satellite_visibility.csv')
 visibility.head()
 
-pass_times = pd.read_csv('results/satellite_visibility.csv')
-
-
-
-grouped = pass_times.groupby('City')
 
 # Grouping the results by city
-for city, group in grouped:
+city_grouped = visibility.groupby('City')
+
+
+for city, group in city_grouped:
     #print(f"City: {city}")
     group = pd.DataFrame(group)
     #print(group.head())
 
 # Save the grouped data to a CSV file
-for city, group in grouped:
-    group.drop('City')
+#for city, group in city_grouped:
     group.to_csv(f'results/satellite_visibility_{city}.csv', index= False)
 
 
+#grouping by satellites
+satellite_grouped = visibility.groupby('Satellite')
 
+for satellite, sat_group in satellite_grouped:
+    sat_group = pd.DataFrame(sat_group)
+    print(sat_group.head())
+    sat_group.to_csv(f'results/satellite_{satellite}_visibility.csv', index= False)
